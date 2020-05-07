@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "SocketRSThread.h"
+#include "Common/TcpSocketBuilder.h"
 #include "SocketObject.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FConnectReceiveDelegate, FString, RemoteIP, int32, RemotePort);
@@ -48,6 +49,8 @@ protected:
 		FReceiveSocketDataDelegate ReceiveSocketDataDelegate;
 
 	/** Server */
+	FSocket* RecSocket;
+
 	FTimerHandle ConnectCheckHandler;
 	FConnectReceiveDelegate ConnectReceiveDelegate;
 	

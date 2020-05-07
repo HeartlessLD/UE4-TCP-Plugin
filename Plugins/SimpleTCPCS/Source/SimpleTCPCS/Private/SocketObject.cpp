@@ -3,7 +3,7 @@
 
 #include "SocketObject.h"
 
-#include "Common/TcpSocketBuilder.h"
+
 
 USocketObject::USocketObject(const FObjectInitializer& ObjectInitializer)
 {
@@ -86,6 +86,12 @@ void USocketObject::Close()
 		ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(Socket);
 		Socket = nullptr;
 	}
+	if (RecSocket)
+	{
+		RecSocket->Close();
+		ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(RecSocket);
+		RecSocket = nullptr;
+	}
 }
 
 void USocketObject::ConnectTickCheck()
@@ -94,7 +100,7 @@ void USocketObject::ConnectTickCheck()
 	if (Socket->HasPendingConnection(bPending) && bPending)
 	{
 		TSharedRef<FInternetAddr> RemoteAddress = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
-		FSocket* RecSocket = Socket->Accept(*RemoteAddress, TEXT("Receive Socket"));
+		RecSocket = Socket->Accept(*RemoteAddress, TEXT("Receive Socket"));
 		USocketRSThread* RSThread = NewObject<USocketRSThread>();
 		RecThreads.Add(RSThread);
 		RSThread->ReceiveSocketDataDelegate = ReceiveSocketDataDelegate;
@@ -138,7 +144,7 @@ bool USocketObject::ConnectServer(FString ServerIP, int32 Port)
 		ESocketErrors LastErr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLastErrorCode();
 
 		UE_LOG(LogTemp, Warning, TEXT("Connect failed with error code (%d) error (%s)"), LastErr, ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetSocketError(LastErr));
-	
+		ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(Socket);
 	}
 	return false;
 }
