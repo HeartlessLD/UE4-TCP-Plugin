@@ -16,8 +16,9 @@ USocketObject::USocketObject(const FObjectInitializer& ObjectInitializer)
 
 void USocketObject::BeginDestroy()
 {
-	Super::BeginDestroy();
 	Close();
+	Super::BeginDestroy();
+	
 }
 
 bool USocketObject::Create(const FString& IP, bool bServer, int32 Port, int32 ReceiveSize, int32 SendSize)
@@ -144,7 +145,7 @@ bool USocketObject::ConnectServer(FString ServerIP, int32 Port)
 		ESocketErrors LastErr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLastErrorCode();
 
 		UE_LOG(LogTemp, Warning, TEXT("Connect failed with error code (%d) error (%s)"), LastErr, ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetSocketError(LastErr));
-		ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(Socket);
+	
 	}
 	return false;
 }
