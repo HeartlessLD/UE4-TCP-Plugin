@@ -43,7 +43,9 @@ protected:
 	class FSocket* Socket;
 	int32 SendDataSize;
 	int32 RecDataDize;
-	TArray<class USocketRSThread*> RecThreads;
+
+	UPROPERTY()
+		TArray<class USocketRSThread*> RecThreads;
 
 	UPROPERTY(BlueprintAssignable, VisibleAnywhere, Category = Network)
 		FReceiveSocketDataDelegate ReceiveSocketDataDelegate;

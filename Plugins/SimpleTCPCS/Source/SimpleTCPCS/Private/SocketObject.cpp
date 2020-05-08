@@ -102,12 +102,17 @@ void USocketObject::ConnectTickCheck()
 	{
 		TSharedRef<FInternetAddr> RemoteAddress = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
 		RecSocket = Socket->Accept(*RemoteAddress, TEXT("Receive Socket"));
-		USocketRSThread* RSThread = NewObject<USocketRSThread>();
+		USocketRSThread* RSThread = NewObject<USocketRSThread>(this);
 		RecThreads.Add(RSThread);
 		RSThread->ReceiveSocketDataDelegate = ReceiveSocketDataDelegate;
 		RSThread->LostConnectionDelegate.AddDynamic(this, &USocketObject::OnDisConnected);
 		RSThread->StartThread(RecSocket, SendDataSize, RecDataDize);
 		ConnectReceiveDelegate.Broadcast(RemoteAddress->ToString(false), RemoteAddress->GetPort());
+	}
+	if (!ReceiveSocketDataDelegate.IsBound())
+	{
+		int a = 2;
+		UE_LOG(LogTemp, Warning, TEXT(" ReceiveSocketDataDelegate√ª”–∞Û∂® "));
 	}
 }
 

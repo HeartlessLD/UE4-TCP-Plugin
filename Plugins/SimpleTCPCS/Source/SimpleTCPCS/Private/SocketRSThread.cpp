@@ -31,6 +31,10 @@ uint32 USocketRSThread::Run()
 			{
 				ReceiveSocketDataDelegate.Broadcast(ReceivedString);
 			}
+			else 
+			{
+				UE_LOG(LogTemp, Warning, TEXT(" thread ReceiveSocketDataDelegate num is 0 "));
+			}
 			
 		}
 	}
