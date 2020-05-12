@@ -9,6 +9,7 @@
 #include "SocketObject.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FConnectReceiveDelegate, FString, RemoteIP, int32, RemotePort);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FConnectedServerResultDelegate, bool, bSuccess);
 /**
  * 
  */
@@ -37,7 +38,8 @@ protected:
 		void OnDisConnected(USocketRSThread* pThread);
 
 	/** Client */
-	bool ConnectServer(FString ServerIP, int32 Port);
+	UFUNCTION(BlueprintCallable)
+	void ConnectServer(FString ServerIP, int32 Port);
 
 protected:
 	class FSocket* Socket;
@@ -49,6 +51,9 @@ protected:
 
 	UPROPERTY(BlueprintAssignable, VisibleAnywhere, Category = Network)
 		FReceiveSocketDataDelegate ReceiveSocketDataDelegate;
+
+	UPROPERTY(BlueprintAssignable, VisibleAnywhere, Category = Network)
+        FConnectedServerResultDelegate ConnectedServerResultDelegate;
 
 	/** Server */
 	FSocket* RecSocket;

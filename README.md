@@ -9,3 +9,4 @@
 
 + 客户端创建并连接
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200506170629572.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L21heGlhb3NoZW5nNTIx,size_16,color_FFFFFF,t_70)
+连接回调 ConnectedServerResult

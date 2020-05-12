@@ -3,6 +3,7 @@
 
 #include "SocketObject.h"
 
+#include "Async.h"
 
 
 USocketObject::USocketObject(const FObjectInitializer& ObjectInitializer)
@@ -62,7 +63,8 @@ bool USocketObject::Create(const FString& IP, bool bServer, int32 Port, int32 Re
 	}
 	else
 	{
-		return ConnectServer(IP, Port);
+		ConnectServer(IP, Port);
+		
 	}
 	return true;
 }
@@ -122,36 +124,41 @@ void USocketObject::OnDisConnected(USocketRSThread* pThread)
 	RecThreads.Remove(pThread);
 }
 
-bool USocketObject::ConnectServer(FString ServerIP, int32 Port)
+void USocketObject::ConnectServer(FString ServerIP, int32 Port)
 {
-	FIPv4Endpoint ServerEndpoint;
-	FIPv4Endpoint::Parse(ServerIP, ServerEndpoint);
-	TSharedPtr<FInternetAddr> addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
-	bool Success = true;
-	addr->SetIp(*ServerIP, Success);
-	if (!Success)
-	{
-		return false;
-	}
-	addr->SetPort(Port);
+	AsyncTask(ENamedThreads::AnyThread, [=]()
+          {
+			FIPv4Endpoint ServerEndpoint;
+			FIPv4Endpoint::Parse(ServerIP, ServerEndpoint);
+			TSharedPtr<FInternetAddr> addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
+			bool Success = true;
+			addr->SetIp(*ServerIP, Success);
+			if (!Success)
+			{
+				ConnectedServerResultDelegate.Broadcast(false);
+				return;
+			}
+			addr->SetPort(Port);
 
-	if (Socket->Connect(*addr))
-	{
-		USocketRSThread* RSThread = NewObject<USocketRSThread>();
-		RecThreads.Add(RSThread);
-		RSThread->ReceiveSocketDataDelegate = ReceiveSocketDataDelegate;
-		RSThread->LostConnectionDelegate.AddDynamic(this, &USocketObject::OnDisConnected);
-		RSThread->StartThread(Socket, SendDataSize, RecDataDize);
-		UE_LOG(LogTemp, Warning, TEXT("Client Connect Success"));
-		return true;
-	}
-	else
-	{
-		ESocketErrors LastErr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLastErrorCode();
+			if (Socket->Connect(*addr))
+			{
+			    USocketRSThread* RSThread = NewObject<USocketRSThread>();
+			    RecThreads.Add(RSThread);
+			    RSThread->ReceiveSocketDataDelegate = ReceiveSocketDataDelegate;
+			    RSThread->LostConnectionDelegate.AddDynamic(this, &USocketObject::OnDisConnected);
+			    RSThread->StartThread(Socket, SendDataSize, RecDataDize);
+			    UE_LOG(LogTemp, Warning, TEXT("Client Connect Success"));
+			    ConnectedServerResultDelegate.Broadcast(true);
+			}
+			else
+			{
+			    ESocketErrors LastErr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLastErrorCode();
 
-		UE_LOG(LogTemp, Warning, TEXT("Connect failed with error code (%d) error (%s)"), LastErr, ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetSocketError(LastErr));
+			    UE_LOG(LogTemp, Warning, TEXT("Connect failed with error code (%d) error (%s)"), LastErr, ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetSocketError(LastErr));
+				ConnectedServerResultDelegate.Broadcast(false);
+			}
+			return;
+          });
 	
-	}
-	return false;
 }
 
