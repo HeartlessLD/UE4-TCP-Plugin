@@ -39,7 +39,7 @@ protected:
 
 	/** Client */
 	UFUNCTION(BlueprintCallable)
-	void ConnectServer(FString ServerIP, int32 Port);
+	void ConnectServer(FString IP, int32 Port);
 
 protected:
 	class FSocket* Socket;
@@ -57,7 +57,7 @@ protected:
 
 	/** Server */
 	FSocket* RecSocket;
-
+	FString ServerIP;
 	FTimerHandle ConnectCheckHandler;
 	FConnectReceiveDelegate ConnectReceiveDelegate;
 	
