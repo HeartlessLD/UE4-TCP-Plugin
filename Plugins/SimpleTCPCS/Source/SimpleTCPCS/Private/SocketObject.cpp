@@ -130,7 +130,7 @@ void USocketObject::OnDisConnected(USocketRSThread* pThread)
 void USocketObject::ConnectServer(FString ip, int32 Port)
 {
 	ServerIP = ip;
-
+	ServerPort = Port；
 	UE_LOG(LogTemp, Warning, TEXT("befor ip = %s"), *ServerIP);
 	AsyncTask(ENamedThreads::AnyThread, [&]()
           {
