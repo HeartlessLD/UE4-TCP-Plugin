@@ -3,7 +3,7 @@
 
 #include "SocketObject.h"
 
-#include "Async.h"
+
 
 
 USocketObject::USocketObject(const FObjectInitializer& ObjectInitializer)
@@ -26,7 +26,6 @@ bool USocketObject::Create(const FString& IP, bool bServer, int32 Port, int32 Re
 {
 	this->SendDataSize = SendSize;
 	this->RecDataDize = ReceiveSize;
-
 	if (bServer)
 	{
 		FIPv4Address ServerAddr;
@@ -114,7 +113,7 @@ void USocketObject::ConnectTickCheck()
 	if (!ReceiveSocketDataDelegate.IsBound())
 	{
 		int a = 2;
-		UE_LOG(LogTemp, Warning, TEXT(" ReceiveSocketDataDelegateû�а� "));
+		UE_LOG(LogTemp, Warning, TEXT(" ReceiveSocketDataDelegate没有绑定 "));
 	}
 }
 
@@ -122,12 +121,20 @@ void USocketObject::OnDisConnected(USocketRSThread* pThread)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Client lost"));
 	RecThreads.Remove(pThread);
+	if (ConnectedServerResultDelegate.IsBound())
+	{
+		ConnectedServerResultDelegate.Broadcast(false);
+	}
 }
 
-void USocketObject::ConnectServer(FString ServerIP, int32 Port)
+void USocketObject::ConnectServer(FString ip, int32 Port)
 {
-	AsyncTask(ENamedThreads::AnyThread, [=]()
+	ServerIP = ip;
+
+	UE_LOG(LogTemp, Warning, TEXT("befor ip = %s"), *ServerIP);
+	AsyncTask(ENamedThreads::AnyThread, [&]()
           {
+			UE_LOG(LogTemp, Warning, TEXT("thread ip = %s"), *ServerIP);
 			FIPv4Endpoint ServerEndpoint;
 			FIPv4Endpoint::Parse(ServerIP, ServerEndpoint);
 			TSharedPtr<FInternetAddr> addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
@@ -148,14 +155,21 @@ void USocketObject::ConnectServer(FString ServerIP, int32 Port)
 			    RSThread->LostConnectionDelegate.AddDynamic(this, &USocketObject::OnDisConnected);
 			    RSThread->StartThread(Socket, SendDataSize, RecDataDize);
 			    UE_LOG(LogTemp, Warning, TEXT("Client Connect Success"));
-			    ConnectedServerResultDelegate.Broadcast(true);
+				if (ConnectedServerResultDelegate.IsBound())
+				{
+					ConnectedServerResultDelegate.Broadcast(true);
+				}
+			    
 			}
 			else
 			{
 			    ESocketErrors LastErr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLastErrorCode();
 
 			    UE_LOG(LogTemp, Warning, TEXT("Connect failed with error code (%d) error (%s)"), LastErr, ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetSocketError(LastErr));
-				ConnectedServerResultDelegate.Broadcast(false);
+				if (ConnectedServerResultDelegate.IsBound())
+				{
+					ConnectedServerResultDelegate.Broadcast(false);
+				}
 			}
 			return;
           });
