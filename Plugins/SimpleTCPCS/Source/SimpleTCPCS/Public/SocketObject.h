@@ -58,6 +58,7 @@ protected:
 	/** Server */
 	FSocket* RecSocket;
 	FString ServerIP;
+	int32 ServerPort;
 	FTimerHandle ConnectCheckHandler;
 	FConnectReceiveDelegate ConnectReceiveDelegate;
 	
