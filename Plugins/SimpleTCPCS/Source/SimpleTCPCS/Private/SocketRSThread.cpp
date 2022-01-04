@@ -12,12 +12,18 @@ uint32 USocketRSThread::Run()
 		bool LostConnect = false;
 		ConnectSocket->HasPendingConnection(LostConnect);
 		ConnectSocket->Wait(ESocketWaitConditions::WaitForReadOrWrite, FTimespan(0, 0, 5));
-		if (LostConnect)
+		if (LostConnect && !ConnectSocket->HasPendingData(Size))
 		{
-			UE_LOG(LogTemp, Warning, TEXT(" Connect lost "));
-			Stop();
-			LostConnectionDelegate.Broadcast(this);
-			continue;
+			ReceiveData.Init(0, 100);
+			int32 Temp;
+			if (!ConnectSocket->Recv(ReceiveData.GetData(), 0, Temp))
+			{
+				UE_LOG(LogTemp, Warning, TEXT(" Connect lost "));
+				Stop();
+				LostConnectionDelegate.Broadcast(this);
+				continue;
+			}
+			
 		}
 
 		
