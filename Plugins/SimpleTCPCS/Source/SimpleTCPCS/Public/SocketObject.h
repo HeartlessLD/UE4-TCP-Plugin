@@ -40,7 +40,8 @@ protected:
 	/** Client */
 	UFUNCTION(BlueprintCallable)
 	void ConnectServer(FString IP, int32 Port);
-
+	//重连服务器
+	void ReconnectServer();
 protected:
 	class FSocket* Socket;
 	int32 SendDataSize;
