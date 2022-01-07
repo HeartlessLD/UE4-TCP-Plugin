@@ -176,3 +176,13 @@ void USocketObject::ConnectServer(FString ip, int32 Port)
 	
 }
 
+void USocketObject::ReconnectServer()
+{
+	Close();
+	Socket = FTcpSocketBuilder(TEXT("Client Socket"))
+		.AsReusable()
+		.AsBlocking()
+		.WithReceiveBufferSize(RecDataDize)
+		.WithSendBufferSize(SendDataSize);
+	ConnectServer(ServerIP, ServerPort);
+}
