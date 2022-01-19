@@ -17,8 +17,9 @@ USocketObject::USocketObject(const FObjectInitializer& ObjectInitializer)
 
 void USocketObject::BeginDestroy()
 {
-	Close();
 	Super::BeginDestroy();
+	Close();
+	
 	
 }
 
@@ -147,7 +148,7 @@ void USocketObject::ConnectServer(FString ip, int32 Port)
 			}
 			addr->SetPort(Port);
 
-			if (Socket->Connect(*addr))
+			if (Socket && Socket->Connect(*addr))
 			{
 			    USocketRSThread* RSThread = NewObject<USocketRSThread>();
 			    RecThreads.Add(RSThread);
