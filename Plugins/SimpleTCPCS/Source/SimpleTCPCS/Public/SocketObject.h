@@ -44,6 +44,7 @@ protected:
 	void ReconnectServer();
 protected:
 	class FSocket* Socket;
+	bool bShutDown;
 	int32 SendDataSize;
 	int32 RecDataDize;
 
