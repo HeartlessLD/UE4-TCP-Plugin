@@ -8,7 +8,7 @@
 
 USocketObject::USocketObject(const FObjectInitializer& ObjectInitializer)
 {
-
+	bShutDown = false;
 }
 
 
@@ -79,6 +79,7 @@ void USocketObject::SendData(FString Message)
 
 void USocketObject::Close()
 {
+	bShutDown = true;
 	if (Socket)
 	{
 		for (auto RecThreald : RecThreads)
@@ -148,7 +149,7 @@ void USocketObject::ConnectServer(FString ip, int32 Port)
 			}
 			addr->SetPort(Port);
 
-			if (Socket && Socket->Connect(*addr))
+			if (bShutDown && Socket->Connect(*addr))
 			{
 			    USocketRSThread* RSThread = NewObject<USocketRSThread>();
 			    RecThreads.Add(RSThread);
