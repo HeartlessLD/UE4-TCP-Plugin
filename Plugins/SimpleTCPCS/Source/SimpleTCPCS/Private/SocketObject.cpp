@@ -19,7 +19,7 @@ void USocketObject::BeginDestroy()
 {
 	Super::BeginDestroy();
 	Close();
-	
+	bShutDown = true;
 	
 }
 
@@ -79,7 +79,7 @@ void USocketObject::SendData(FString Message)
 
 void USocketObject::Close()
 {
-	bShutDown = true;
+	
 	if (Socket)
 	{
 		for (auto RecThreald : RecThreads)
