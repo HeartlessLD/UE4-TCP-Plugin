@@ -9,6 +9,7 @@
 USocketObject::USocketObject(const FObjectInitializer& ObjectInitializer)
 {
 	bShutDown = false;
+	bConnecting = false;
 }
 
 
@@ -17,9 +18,10 @@ USocketObject::USocketObject(const FObjectInitializer& ObjectInitializer)
 
 void USocketObject::BeginDestroy()
 {
-	Super::BeginDestroy();
-	Close();
+	if(!bConnecting)
+		Close();
 	bShutDown = true;
+	Super::BeginDestroy();
 	
 }
 
@@ -149,7 +151,7 @@ void USocketObject::ConnectServer(FString ip, int32 Port)
 			}
 			addr->SetPort(Port);
 
-			if (bShutDown && Socket->Connect(*addr))
+			if (!bShutDown && Socket->Connect(*addr))
 			{
 			    USocketRSThread* RSThread = NewObject<USocketRSThread>();
 			    RecThreads.Add(RSThread);
@@ -161,14 +163,14 @@ void USocketObject::ConnectServer(FString ip, int32 Port)
 				{
 					ConnectedServerResultDelegate.Broadcast(true);
 				}
-			    
+			    bConnecting = true;
 			}
 			else
 			{
 			    ESocketErrors LastErr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLastErrorCode();
 
 			    UE_LOG(LogTemp, Warning, TEXT("Connect failed with error code (%d) error (%s)"), LastErr, ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetSocketError(LastErr));
-				if (ConnectedServerResultDelegate.IsBound())
+				if (!bShutDown && ConnectedServerResultDelegate.IsBound())
 				{
 					ConnectedServerResultDelegate.Broadcast(false);
 				}
