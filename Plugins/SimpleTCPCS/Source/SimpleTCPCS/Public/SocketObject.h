@@ -45,6 +45,7 @@ protected:
 protected:
 	class FSocket* Socket;
 	bool bShutDown;
+	bool bConnecting;
 	int32 SendDataSize;
 	int32 RecDataDize;
 
