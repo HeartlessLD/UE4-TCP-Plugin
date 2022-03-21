@@ -4,6 +4,12 @@
 #include "SocketRSThread.h"
 #include "SocketSubsystem.h"
 
+void USocketRSThread::BeginDestroy()
+{
+	Stop();
+	Super::BeginDestroy();
+}
+
 uint32 USocketRSThread::Run()
 {
 	while (!bThreadStop && ConnectSocket)
