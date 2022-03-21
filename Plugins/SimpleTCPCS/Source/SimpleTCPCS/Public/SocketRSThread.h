@@ -17,7 +17,7 @@ class SIMPLETCPCS_API USocketRSThread : public UObject, public FRunnable
 {
 	GENERATED_BODY()
 public:
-
+	virtual void BeginDestroy() override;
 	//FRunnable Interface
 	virtual bool Init() override { return true; }
 	virtual uint32 Run() override;
