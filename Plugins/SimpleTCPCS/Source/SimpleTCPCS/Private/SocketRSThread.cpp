@@ -35,9 +35,10 @@ uint32 USocketRSThread::Run()
 		
 		if (ConnectSocket && ConnectSocket->HasPendingData(Size))
 		{
-			ReceiveData.Init(0, FMath::Min(Size, RecDataSize));
+			int32 minSize = FMath::Min(Size, RecDataSize);
+			ReceiveData.Init(0, minSize);
 			int32 Readed;
-			ConnectSocket->Recv(ReceiveData.GetData(), RecDataSize, Readed);
+			if (!ConnectSocket->Recv(ReceiveData.GetData(), minSize, Readed))
 			FString ReceivedString = FString(ANSI_TO_TCHAR(reinterpret_cast<const char*>(ReceiveData.GetData())));
 			if (ReceiveSocketDataDelegate.IsBound())
 			{
