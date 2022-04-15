@@ -65,7 +65,7 @@ void USocketRSThread::StartThread(FSocket* Socket, uint32 SizeSend, uint32 SizeR
 void USocketRSThread::Stop()
 {
 	bThreadStop = true;
-	
+	ConnectSocket = nullptr;
 }
 
 void USocketRSThread::SendData(FString Message)
