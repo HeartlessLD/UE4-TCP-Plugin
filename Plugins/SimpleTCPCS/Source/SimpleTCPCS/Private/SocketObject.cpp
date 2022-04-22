@@ -163,7 +163,7 @@ void USocketObject::ConnectServer(FString ip, int32 Port)
 				{
 					ConnectedServerResultDelegate.Broadcast(true);
 				}
-			    bConnecting = true;
+			    
 			}
 			else
 			{
@@ -175,6 +175,7 @@ void USocketObject::ConnectServer(FString ip, int32 Port)
 					ConnectedServerResultDelegate.Broadcast(false);
 				}
 			}
+		  bConnecting = false;
 			return;
           });
 	
