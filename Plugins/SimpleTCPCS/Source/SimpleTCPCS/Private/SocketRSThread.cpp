@@ -56,6 +56,7 @@ uint32 USocketRSThread::Run()
 			}
 			
 		}
+		ReceiveData.Empty();
 	}
 	return 0;
 }
