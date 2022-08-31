@@ -147,7 +147,7 @@ void USocketObject::ConnectServer(FString ip, int32 Port)
 				ConnectedResultDelegate.Broadcast(false);
 				return;
 			}
-			addr->SetPort(Port);
+			addr->SetPort(ServerPort);
 
 			if (!bShutDown && Socket->Connect(*addr))
 			{
