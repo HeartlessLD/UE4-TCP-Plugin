@@ -39,10 +39,15 @@ uint32 USocketRSThread::Run()
 			ReceiveData.Init(0, minSize);
 			int32 Readed;
 			if (!ConnectSocket->Recv(ReceiveData.GetData(), minSize, Readed))
-			FString ReceivedString = FString(ANSI_TO_TCHAR(reinterpret_cast<const char*>(ReceiveData.GetData())));
+			{
+				UE_LOG(LogTemp, Warning, TEXT(" Connect lost "));
+				LostConnectionDelegate.Broadcast(this);
+				continue;
+			}
+			FString ReceivedStr = FString(ANSI_TO_TCHAR(reinterpret_cast<const char*>(ReceiveData.GetData())));
 			if (ReceiveSocketDataDelegate.IsBound())
 			{
-				ReceiveSocketDataDelegate.Broadcast(ReceivedString);
+				ReceiveSocketDataDelegate.Broadcast(ReceivedStr);
 			}
 			else 
 			{

@@ -8,8 +8,8 @@
 #include "Common/TcpSocketBuilder.h"
 #include "SocketObject.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FConnectReceiveDelegate, FString, RemoteIP, int32, RemotePort);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FConnectedServerResultDelegate, bool, bSuccess);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FClientConnectDelegate, FString, RemoteIP, int32, RemotePort);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FConnectedResultDelegate, bool, bSuccess);
 /**
  * 
  */
@@ -41,7 +41,8 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void ConnectServer(FString IP, int32 Port);
 	//重连服务器
-	void ReconnectServer();
+	UFUNCTION(BlueprintCallable)
+		void ReconnectServer();
 protected:
 	class FSocket* Socket;
 	bool bShutDown;
@@ -56,13 +57,15 @@ protected:
 		FReceiveSocketDataDelegate ReceiveSocketDataDelegate;
 
 	UPROPERTY(BlueprintAssignable, VisibleAnywhere, Category = Network)
-        FConnectedServerResultDelegate ConnectedServerResultDelegate;
+        FConnectedResultDelegate ConnectedResultDelegate;
 
 	/** Server */
 	FSocket* RecSocket;
 	FString ServerIP;
 	int32 ServerPort;
 	FTimerHandle ConnectCheckHandler;
-	FConnectReceiveDelegate ConnectReceiveDelegate;
+
+	UPROPERTY(BlueprintAssignable, VisibleAnywhere, Category = Network)
+	FClientConnectDelegate ClientConnectDelegate;
 	
 };
