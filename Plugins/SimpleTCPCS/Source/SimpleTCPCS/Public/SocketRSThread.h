@@ -35,8 +35,8 @@ public:
 
 protected:
 	FSocket* ConnectSocket;
-	uint32 SendDataSize;
-	uint32 RecDataSize;
+	uint32 MaxSendDataSize;
+	uint32 MaxRecDataSize;
 	TArray<uint8> ReceiveData;
 	FRunnableThread* pThread;
 	bool bThreadStop;
