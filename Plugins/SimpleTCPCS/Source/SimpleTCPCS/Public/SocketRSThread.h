@@ -38,6 +38,7 @@ protected:
 	uint32 MaxSendDataSize;
 	uint32 MaxRecDataSize;
 	TArray<uint8> ReceiveData;
+	TArray<uint8> SendDataBuffer;
 	FRunnableThread* pThread;
 	bool bThreadStop;
 };
