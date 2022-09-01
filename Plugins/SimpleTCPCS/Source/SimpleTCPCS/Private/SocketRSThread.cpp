@@ -30,10 +30,10 @@ uint32 USocketRSThread::Run()
 				LostConnectionDelegate.Broadcast(this);
 				continue;
 			}
-			
+
 		}
 
-		
+
 		if (ConnectSocket && ConnectSocket->HasPendingData(Size))
 		{
 			int32 minSize = FMath::Min(Size, MaxRecDataSize);
@@ -46,15 +46,16 @@ uint32 USocketRSThread::Run()
 				continue;
 			}
 			FString ReceivedStr = FString(UTF8_TO_TCHAR(ReceiveData.GetData()));
+			UE_LOG(LogTemp, Warning, TEXT("receive message = %s  size = %d"), *ReceivedStr, minSize);
 			if (ReceiveSocketDataDelegate.IsBound())
 			{
 				ReceiveSocketDataDelegate.Broadcast(ReceivedStr);
 			}
-			else 
+			else
 			{
 				UE_LOG(LogTemp, Warning, TEXT(" thread ReceiveSocketDataDelegate num is 0 "));
 			}
-			
+
 		}
 		ReceiveData.Empty();
 	}
@@ -77,20 +78,20 @@ void USocketRSThread::Stop()
 
 void USocketRSThread::SendData(FString Message)
 {
-	TCHAR* SendMessage = Message.GetCharArray().GetData();
-	uint8* strSend = (uint8*)TCHAR_TO_UTF8(SendMessage);
-	int32 sendSize = strlen((const char*)strSend);
 
+	std::string strSend(TCHAR_TO_UTF8(*Message));
+	SendDataBuffer.Init(0, strSend.size() + 1);
+	memcpy(SendDataBuffer.GetData(), strSend.data(), strSend.size());
 	int32 sent = 0;
-	if (sendSize >= (int32)MaxSendDataSize)
+	if (SendDataBuffer.Num() >= (int32)MaxSendDataSize)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Send Data Size is Larger than Max Size for set"));
 	}
 	else
 	{
-		if (ConnectSocket && ConnectSocket->Send(strSend, sendSize, sent))
+		if (ConnectSocket && ConnectSocket->Send(SendDataBuffer.GetData(), SendDataBuffer.Num(), sent))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("___Send Succeed!"));
+			UE_LOG(LogTemp, Warning, TEXT("___Send Succeed! msg = %s messageSize = %d sended = %d"), *Message, SendDataBuffer.Num(), sent);
 
 		}
 		else
