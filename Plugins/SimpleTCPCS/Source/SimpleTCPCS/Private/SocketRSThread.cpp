@@ -37,7 +37,7 @@ uint32 USocketRSThread::Run()
 		if (ConnectSocket && ConnectSocket->HasPendingData(Size))
 		{
 			int32 minSize = FMath::Min(Size, MaxRecDataSize);
-			ReceiveData.Init(0, minSize);
+			ReceiveData.Init(0, minSize + 1);
 			int32 Readed;
 			if (!ConnectSocket->Recv(ReceiveData.GetData(), minSize, Readed))
 			{
