@@ -1,6 +1,6 @@
 # UE4-TCP-Plugin
 简单的UE4 tcp通信插件
-注意 这个插件目前只支持字符串传送（接收 发送进行了+1操作），如果发送字节流数据的话可能会错误
+注意 这个插件目前只支持简单的字符串传送，没有做粘包处理（接收 发送进行了+1操作），如果频繁发送字节流数据的话可能会错误
 
 + 实现了简单的TCPServer TCPClient 相互连接 发送数据
 [github地址](https://github.com/HeartlessLD/UE4-TCP-Plugin)
